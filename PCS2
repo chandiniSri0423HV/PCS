@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    stages {
+        stage('Import Process Application') {
+            steps {
+                script {
+                    bat """
+                        curl --location "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
+                        --header "Accept: application/json" \
+                        --user ${Username}:${Password} \
+                        --form "restDeployConfig={\\"revisionId\\": \\"${params.Application_Version}\\"}" \
+                        --form "exp=@\\"${params.Application_File}\\""
+                    """
+                }
+            }
+        }
+		stage('Undeploy an application'){
+			steps{
+				script{
+					bat"""
+						curl --location --request DELETE '${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Application_Version}' \
+						--user ${Username}:${Password} \
+					"""
+				}
+			}
+		}
+    }
+}
