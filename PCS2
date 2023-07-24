@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     bat """
-                        curl --location --request DELETE "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/Undeploy_Version" \
+                        curl --location --request DELETE "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}" \
                         --user ${Username}:${Password}  \
                         --header "Accept: application/json"
                     """
