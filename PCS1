@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+    stages {
+        stage('Import Process Application') {
+            steps {
+                script {
+                    bat """
+                        curl --location "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
+                        --header "Accept: application/json" \
+                        --user ${Username}:${Password} \
+                        --form "restDeployConfig={\\"revisionId\\": \\"${params.Application_Version}\\"}" \
+                        --form "exp=@\\"${params.Application_File}\\""
+                    """
+                }
+            }
+        }
+    }
+}
