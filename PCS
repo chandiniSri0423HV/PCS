@@ -9,7 +9,7 @@ pipeline {
                         --header 'Accept: application/json' \
                         --header 'Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==' \
                         --form 'restDeployConfig={\"revisionId\": \"3.0\", \"overwrite\": true, \"forceDefault\": true, \"addMeToAllRoles\": false}' \
-                        --form 'exp=@\"/C:/Docs/Git/PCS/SampleApplication.exp\"'
+                        --form "exp=@\"C:\\Docs\\Git\\PCS\\SampleApplication.exp\""
                     """
                 }
             }
