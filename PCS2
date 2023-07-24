@@ -14,15 +14,17 @@ pipeline {
                 }
             }
         }
-		stage('Undeploy an application'){
-			steps{
-				script{
-					bat"""
-						curl --location --request DELETE '${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Application_Version}' \
-						--user ${Username}:${Password} \
-					"""
-				}
-			}
-		}
+        
+        stage('Undeploy an application') {
+            steps {
+                script {
+                    bat """
+                        curl --location --request DELETE "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/Undeploy_Version" \
+                        --user ${Username}:${Password}  \
+                        --header "Accept: application/json"
+                    """
+                }
+            }
+        }
     }
 }
