@@ -1,13 +1,14 @@
 def passwordHandler(String input) {
-   StringBuilder result = new StringBuilder()
-   for (int i = 0; i < input.length(); i++) {
-       if (input.charAt(i) == '%') {
-           result.append('%')
-       }
-       result.append(input.charAt(i))
-   }
-   return result.toString()
+    StringBuilder result = new StringBuilder()
+    for (int i = 0; i < input.length(); i++) {
+        if (input.charAt(i) == '%') {
+            result.append('%')
+        }
+        result.append(input.charAt(i))
+    }
+    return result.toString()
 }
+
 def Update_details(instance_selected) {
     if (instance_selected.equals("DEV")) {
         env.USR = env.DEV_Creds_USR
@@ -15,11 +16,14 @@ def Update_details(instance_selected) {
         env.serviceURL = env.DEV_URL
     }
 }
+
 pipeline {
     agent any
-	environment {
+
+    environment {
         DEV_Creds = credentials('DEV_CredID')
     }
+
     stages {
         stage('Import Process Application') {
             steps {
@@ -29,27 +33,23 @@ pipeline {
                     bat """
                         curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
                         --header "Accept: application/json" \
-                        --user ${env.USR}:${env.PSW} \
-                        --form "restDeployConfig={\\"revisionId\\": \\"${params.Application_Version}\\"}" \
-                        --form "exp=@\\"${params.Application_File}\\""
+                        --user ${env.USR}:${passwordHandler(env.PSW)} \
+                        --form "restDeployConfig={\\\"revisionId\\\": \\\"${params.Application_Version}\\\"}" \
+                        --form "exp=@\\\"${params.Application_File}\\\""
                     """
                 }
             }
-        }   
-	stage('Deactivate Previous Application') {
-    steps {
-        script {
-            withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'USR', usernameVariable: 'PSW')]) {
-                bat """
-                    curl --location --request PATCH "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/SampleApplication/revisions/1.0" \
-                    --user ${USR}:${PSW} \
-                    --header "Content-Type: application/json" \
-                    --data "{\"state\": \"OFF\",\"mode\": \"RETIRED\"}"
-                """
+        }
+
+        stage('Deactivate Previous Application') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/SampleApplication/revisions/1.0\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+                        bat(deployIntegCmd)
+                    }
+                }
             }
         }
-    }
-}
-
     }
 }
