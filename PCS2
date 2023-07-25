@@ -45,7 +45,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/SampleApplication/revisions/1.0\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
                         bat(deployIntegCmd)
                     }
                 }
