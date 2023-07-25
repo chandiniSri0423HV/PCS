@@ -1,28 +1,5 @@
-def passwordHandler(String input) {
-    // ... (same as before)
-}
 
-def Update_details(instance_selected) {
-    // ... (same as before)
-}
-
-pipeline {
-    agent any
-
-    environment {
-        DEV_Creds = credentials('DEV_CredID')
-    }
-
-    parameters {
-        booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
-        string(name: 'Application_ID', defaultValue: '', description: 'Application ID', trim: true)
-        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Deactivation Application Version', trim: true)
-    }
-
-    stages {
-        stage('Import Process Application') {
-            steps {
-                // ... (same as before)
+                }
             }
         }
 
@@ -48,6 +25,6 @@ pipeline {
                     }
                 }
             }
-        }
+}
     }
 }
