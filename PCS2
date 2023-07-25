@@ -23,6 +23,9 @@ pipeline {
     environment {
         DEV_Creds = credentials('DEV_CredID')
     }
+	parameters {
+        booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
+    }
 
     stages {
         stage('Import Process Application') {
@@ -44,9 +47,13 @@ pipeline {
         stage('Deactivate Previous Application') {
             steps {
                 script {
+				 if (params.Deactivate_Application) {
+                        // Perform action when the checkbox is checked
+                    echo 'Checkbox is checked'
                     withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
-                        bat(deployIntegCmd)
+					def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+                    bat(deployIntegCmd)
+					echo "Application deactivated"
                     }
                 }
             }
