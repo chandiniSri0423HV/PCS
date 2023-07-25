@@ -26,20 +26,34 @@ pipeline {
         DEV_Creds = credentials('DEV_CredID')
     }
 
+
     parameters {
-        booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
-        string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visibleWhen: 'Deactivate_Application == "true"')
-        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visibleWhen: 'Deactivate_Application == "true"')
+       booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
+        string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visible: false)
+        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visible: false)
     }
 
     triggers {
         parameters([booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')])
     }
+ stages {
+        stage('Import Process Application') {
+            steps {
+                script {
+                    Update_details((params.InstanceURL).toString())
+                    //echo "${env.serviceURL}"
+                    bat """
+                        curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
+                        --header "Accept: application/json" \
+                        --user ${env.USR}:${passwordHandler(env.PSW)} \
+                        --form "restDeployConfig={\\\"revisionId\\\": \\\"${params.Application_Version}\\\"}" \
+                        --form "exp=@\\\"${params.Application_File}\\\""
+                    """
+                }
+            }
+        }
 
-    stages {
-        // ... Your existing stages here ...
-
-        stage('Deactivate Previous Application') {
+    stage('Deactivate Previous Application') {
             when {
                 expression { params.Deactivate_Application }
             }
@@ -48,6 +62,23 @@ pipeline {
                     echo 'Checkbox is checked'
                     Update_details((params.InstanceURL).toString())
                     withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+                        // Groovy Script for Active Choices Parameter
+                        def showApplicationID = false
+                        def showDeactivationVersion = false
+
+                        if (params.Deactivate_Application == true) {
+                            showApplicationID = true
+                            showDeactivationVersion = true
+                        }
+
+                        properties([
+                            parameters([
+                                booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application'),
+                                string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visible: showApplicationID),
+                                string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visible: showDeactivationVersion)
+                            ])
+                        ])
+
                         def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data ${JsonOutput.toJson([state: 'OFF', mode: 'RETIRED'])}"
                         bat(deployIntegCmd)
                         echo "Application deactivated"
