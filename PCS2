@@ -26,22 +26,17 @@ pipeline {
         DEV_Creds = credentials('DEV_CredID')
     }
 
-
     parameters {
-       booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
+        booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
         string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visible: false)
         string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visible: false)
     }
 
-    triggers {
-        parameters([booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')])
-    }
- stages {
+    stages {
         stage('Import Process Application') {
             steps {
                 script {
                     Update_details((params.InstanceURL).toString())
-                    //echo "${env.serviceURL}"
                     bat """
                         curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
                         --header "Accept: application/json" \
@@ -53,7 +48,7 @@ pipeline {
             }
         }
 
-    stage('Deactivate Previous Application') {
+        stage('Deactivate Previous Application') {
             when {
                 expression { params.Deactivate_Application }
             }
