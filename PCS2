@@ -40,13 +40,10 @@ pipeline {
             steps {
                 script {
                     bat """
-                        curl --location --request PATCH '${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/"${params.Application_ID}/revisions/"${params.Deactivate_Application_Version}' \
+                        curl --location --request PATCH "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/'${params.Application_ID}/revisions/'${params.Deactivate_Application_Version}" \
 						--user ${env.USR}:${env.PSW} \
 						--header 'Content-Type: application/json' \
-						--data '{
-									"state": "OFF",
-									"mode": "RETIRED"
-								}'
+						--data "{\"state\": \"OFF\",\"mode\": \"RETIRED\"}"
                     """
                 }
             }
