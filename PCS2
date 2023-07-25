@@ -7,6 +7,7 @@ pipeline {
         stage('Import Process Application') {
             steps {
                 script {
+			Update_details((params.InstanceURL).toString())
                     bat """
                         curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
                         --header "Accept: application/json" \
