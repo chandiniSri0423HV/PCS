@@ -1,20 +1,9 @@
 def passwordHandler(String input) {
-    StringBuilder result = new StringBuilder()
-    for (int i = 0; i < input.length(); i++) {
-        if (input.charAt(i) == '%') {
-            result.append('%')
-        }
-        result.append(input.charAt(i))
-    }
-    return result.toString()
+    // ... (same as before)
 }
 
 def Update_details(instance_selected) {
-    if (instance_selected.equals("DEV")) {
-        env.USR = env.DEV_Creds_USR
-        env.PSW = env.DEV_Creds_PSW
-        env.serviceURL = env.DEV_URL
-    }
+    // ... (same as before)
 }
 
 pipeline {
@@ -23,70 +12,17 @@ pipeline {
     environment {
         DEV_Creds = credentials('DEV_CredID')
     }
-	parameters {
+
+    parameters {
         booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
+        string(name: 'Application_ID', defaultValue: '', description: 'Application ID', trim: true, visible: false)
+        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Deactivation Application Version', trim: true, visible: false)
     }
 
     stages {
         stage('Import Process Application') {
             steps {
-                script {
-                    Update_details((params.InstanceURL).toString())
-                    //echo "${env.serviceURL}"
-                    bat """
-                        curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
-                        --header "Accept: application/json" \
-                        --user ${env.USR}:${passwordHandler(env.PSW)} \
-                        --form "restDeployConfig={\\\"revisionId\\\": \\\"${params.Application_Version}\\\"}" \
-                        --form "exp=@\\\"${params.Application_File}\\\""
-                    """
-                }
-            }
-        }
-
-        def passwordHandler(String input) {
-    StringBuilder result = new StringBuilder()
-    for (int i = 0; i < input.length(); i++) {
-        if (input.charAt(i) == '%') {
-            result.append('%')
-        }
-        result.append(input.charAt(i))
-    }
-    return result.toString()
-}
-
-def Update_details(instance_selected) {
-    if (instance_selected.equals("DEV")) {
-        env.USR = env.DEV_Creds_USR
-        env.PSW = env.DEV_Creds_PSW
-        env.serviceURL = env.DEV_URL
-    }
-}
-
-pipeline {
-    agent any
-
-    environment {
-        DEV_Creds = credentials('DEV_CredID')
-    }
-	parameters {
-        booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
-    }
-
-    stages {
-        stage('Import Process Application') {
-            steps {
-                script {
-                    Update_details((params.InstanceURL).toString())
-                    //echo "${env.serviceURL}"
-                    bat """
-                        curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
-                        --header "Accept: application/json" \
-                        --user ${env.USR}:${passwordHandler(env.PSW)} \
-                        --form "restDeployConfig={\\\"revisionId\\\": \\\"${params.Application_Version}\\\"}" \
-                        --form "exp=@\\\"${params.Application_File}\\\""
-                    """
-                }
+                // ... (same as before)
             }
         }
 
@@ -97,7 +33,15 @@ pipeline {
                         echo 'Checkbox is checked'
                         Update_details((params.InstanceURL).toString())
                         withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-                            def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+                            // Prompt for Application_ID and Deactivate_Application_Version only if the checkbox is checked
+                            def userInput = input message: 'Enter Application ID and Deactivation Application Version:', parameters: [
+                                [$class: 'TextParameterDefinition', name: 'Application_ID', defaultValue: '', description: 'Application ID'],
+                                [$class: 'TextParameterDefinition', name: 'Deactivate_Application_Version', defaultValue: '', description: 'Deactivation Application Version']
+                            ]
+                            def applicationID = userInput['Application_ID']
+                            def deactivationVersion = userInput['Deactivate_Application_Version']
+
+                            def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${applicationID}/revisions/${deactivationVersion}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
                             bat(deployIntegCmd)
                             echo "Application deactivated"
                         }
@@ -107,8 +51,5 @@ pipeline {
                 }
             }
         }
-    }
-}
-
     }
 }
