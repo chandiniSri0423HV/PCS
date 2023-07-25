@@ -28,8 +28,8 @@ pipeline {
 
     parameters {
         booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
-        string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true)
-        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true)
+        string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visibleWhen: 'Deactivate_Application == "true"')
+        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visibleWhen: 'Deactivate_Application == "true"')
     }
 
     triggers {
@@ -37,21 +37,7 @@ pipeline {
     }
 
     stages {
-        stage('Import Process Application') {
-            steps {
-                script {
-                    Update_details((params.InstanceURL).toString())
-                    // echo "${env.serviceURL}"
-                    bat """
-                        curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
-                        --header "Accept: application/json" \
-                        --user ${env.USR}:${passwordHandler(env.PSW)} \
-                        --form "restDeployConfig={\\\"revisionId\\\": \\\"${params.Application_Version}\\\"}" \
-                        --form "exp=@\\\"${params.Application_File}\\\""
-                    """
-                }
-            }
-        }
+        // ... Your existing stages here ...
 
         stage('Deactivate Previous Application') {
             when {
