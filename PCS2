@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+
 def passwordHandler(String input) {
     StringBuilder result = new StringBuilder()
     for (int i = 0; i < input.length(); i++) {
@@ -23,9 +25,15 @@ pipeline {
     environment {
         DEV_Creds = credentials('DEV_CredID')
     }
-    
+
     parameters {
         booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
+        string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true)
+        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true)
+    }
+
+    triggers {
+        parameters([booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')])
     }
 
     stages {
@@ -33,7 +41,7 @@ pipeline {
             steps {
                 script {
                     Update_details((params.InstanceURL).toString())
-                    //echo "${env.serviceURL}"
+                    // echo "${env.serviceURL}"
                     bat """
                         curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
                         --header "Accept: application/json" \
@@ -54,7 +62,7 @@ pipeline {
                     echo 'Checkbox is checked'
                     Update_details((params.InstanceURL).toString())
                     withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-                        def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+                        def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data ${JsonOutput.toJson([state: 'OFF', mode: 'RETIRED'])}"
                         bat(deployIntegCmd)
                         echo "Application deactivated"
                     }
