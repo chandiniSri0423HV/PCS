@@ -37,16 +37,19 @@ pipeline {
             }
         }   
 	stage('Deactivate Previous Application') {
-            steps {
-                script {
-                    bat """
-                        curl --location --request PATCH "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}" \
-						--user ${env.USR}:${env.PSW} \
-						--header 'Content-Type: application/json' \
-						--data "{\"state\": \"OFF\",\"mode\": \"RETIRED\"}"
-                    """
-                }
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'USR', usernameVariable: 'PSW')]) {
+                bat """
+                    curl --location --request PATCH "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/SampleApplication/revisions/1.0" \
+                    --user ${USR}:${PSW} \
+                    --header "Content-Type: application/json" \
+                    --data "{\"state\": \"OFF\",\"mode\": \"RETIRED\"}"
+                """
             }
         }
+    }
+}
+
     }
 }
