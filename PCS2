@@ -28,8 +28,8 @@ pipeline {
 
     parameters {
         booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
-        string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visible: false)
-        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visible: false)
+        string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visible: params.Deactivate_Application)
+        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visible: params.Deactivate_Application)
     }
 
     stages {
