@@ -58,19 +58,11 @@ pipeline {
                     Update_details((params.InstanceURL).toString())
                     withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
                         // Groovy Script for Active Choices Parameter
-                        def showApplicationID = false
-                        def showDeactivationVersion = false
-
-                        if (params.Deactivate_Application == true) {
-                            showApplicationID = true
-                            showDeactivationVersion = true
-                        }
-
                         properties([
                             parameters([
                                 booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application'),
-                                string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visible: showApplicationID),
-                                string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visible: showDeactivationVersion)
+                                string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visible: params.Deactivate_Application),
+                                string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visible: params.Deactivate_Application)
                             ])
                         ])
 
