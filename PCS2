@@ -48,7 +48,7 @@ pipeline {
                         // Perform action when the checkbox is checked
 						echo 'Checkbox is checked'
 						withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-							def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+							def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_OR_Undeploy_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
 							bat(deployIntegCmd)
 							echo "Application deactivated"
 						}
@@ -61,7 +61,7 @@ pipeline {
 				script {
 					if (params.Undeploy_Application) {
 						withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-							def undeployApp = "curl --location --request DELETE \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}\" --user \"${USR}:${passwordHandler(PSW)}\""
+							def undeployApp = "curl --location --request DELETE \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_OR_Undeploy_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\""
 							bat(undeployApp)
 						}
 					}
