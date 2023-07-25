@@ -1,30 +1,40 @@
+def passwordHandler(String input) {
+   StringBuilder result = new StringBuilder()
+   for (int i = 0; i < input.length(); i++) {
+       if (input.charAt(i) == '%') {
+           result.append('%')
+       }
+       result.append(input.charAt(i))
+   }
+   return result.toString()
+}
+def Update_details(instance_selected) {
+    if (instance_selected.equals("DEV")) {
+        env.USR = env.DEV_Creds_USR
+        env.PSW = env.DEV_Creds_PSW
+        env.serviceURL = env.DEV_URL
+    }
+}
 pipeline {
     agent any
+	environment {
+        DEV_Creds = credentials('DEV_CredID')
+    }
     stages {
         stage('Import Process Application') {
             steps {
                 script {
+                    Update_details((params.InstanceURL).toString())
+                    //echo "${env.serviceURL}"
                     bat """
-                        curl --location "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
+                        curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
                         --header "Accept: application/json" \
-                        --user ${Username}:${Password} \
+                        --user ${env.USR}:${env.PSW} \
                         --form "restDeployConfig={\\"revisionId\\": \\"${params.Application_Version}\\"}" \
                         --form "exp=@\\"${params.Application_File}\\""
                     """
                 }
             }
-        }
-        
-        stage('Undeploy an application') {
-            steps {
-                script {
-                    bat """
-                        curl --location --request DELETE "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}" \
-                        --user ${Username}:${Password}  \
-                        --header "Accept: application/json"
-                    """
-                }
-            }
-        }
+        }       
     }
 }
