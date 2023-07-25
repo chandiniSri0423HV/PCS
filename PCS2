@@ -60,12 +60,9 @@ pipeline {
 			steps {
 				script {
 					if (params.Undeploy_Application) {
-						withCredentials([usernamePassword(credentialsId: 'Your_Credentials_ID', passwordVariable: 'Password', usernameVariable: 'Username')]) {
-							bat """
-								curl --location --request DELETE "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}" \
-								--user ${Username}:${Password}  \
-								--header "Accept: application/json"
-							"""
+						withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'Username')]) {
+							def undeployApp = "curl --location --request DELETE "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}" --user \"${USR}:${passwordHandler(PSW)}\" --header "Accept: application/json\""
+							bat(undeployApp)
 						}
 					}
 				}
