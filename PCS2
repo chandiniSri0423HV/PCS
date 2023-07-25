@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     Update_details((params.InstanceURL).toString())
-                    //echo "${env.serviceURL}"
+                    // echo "${env.serviceURL}"
                     bat """
                         curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
                         --header "Accept: application/json" \
@@ -44,29 +44,29 @@ pipeline {
         stage('Deactivate Previous Application') {
             steps {
                 script {
-					if (params.Deactivate_Application) {
-                        // Perform action when the checkbox is checked
-						echo 'Checkbox is checked'
-						withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-							def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
-							bat(deployIntegCmd)
-							echo "Application deactivated"
-						}
-					}
-				}
-			}
+                    if (params.Deactivate_Application) {
+                        echo 'Checkbox is checked'
+                        withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+                            def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+                            bat(deployIntegCmd)
+                            echo "Application deactivated"
+                        }
+                    }
+                }
+            }
         }
-		stage('Undeploy an application') {
-			steps {
-				script {
-					if (params.Undeploy_Application) {
-						withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'Username')]) {
-							def undeployApp = "curl --location --request DELETE \"${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Accept: application/json\""
-							bat(undeployApp)
-						}
-					}
-				}
-			}
-		}
+
+        stage('Undeploy an application') {
+            steps {
+                script {
+                    if (params.Undeploy_Application) {
+                        withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+                            def undeployApp = "curl --location --request DELETE \"${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Accept: application/json\""
+                            bat(undeployApp)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
