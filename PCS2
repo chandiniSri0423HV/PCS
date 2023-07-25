@@ -23,9 +23,7 @@ pipeline {
     environment {
         DEV_Creds = credentials('DEV_CredID')
     }
-	parameters {
-        booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
-    }
+	
 
     stages {
         stage('Import Process Application') {
