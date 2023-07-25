@@ -23,14 +23,24 @@ pipeline {
     environment {
         DEV_Creds = credentials('DEV_CredID')
     }
-	
+
+    parameters {
+        booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
+        string(name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', trim: true, visible: false)
+        string(name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', trim: true, visible: false)
+        booleanParam(name: 'Undeploy_Application', defaultValue: false, description: 'Check the box to undeploy the application')
+        string(name: 'Application_Name', defaultValue: '', description: 'Enter the application name', trim: true, visible: false)
+        string(name: 'Undeploy_Version', defaultValue: '', description: 'Enter the undeploy version', trim: true, visible: false)
+        string(name: 'Instance_URL', defaultValue: '', description: 'Enter the instance URL', trim: true, visible: true)
+        string(name: 'Username', defaultValue: '', description: 'Enter the username', trim: true, visible: true)
+        string(name: 'Password', defaultValue: '', description: 'Enter the password', trim: true, visible: true)
+    }
 
     stages {
         stage('Import Process Application') {
             steps {
                 script {
                     Update_details((params.InstanceURL).toString())
-                    //echo "${env.serviceURL}"
                     bat """
                         curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
                         --header "Accept: application/json" \
@@ -45,30 +55,30 @@ pipeline {
         stage('Deactivate Previous Application') {
             steps {
                 script {
-					if (params.Deactivate_Application) {
-                        // Perform action when the checkbox is checked
-						echo 'Checkbox is checked'
-						withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-							def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
-							bat(deployIntegCmd)
-							echo "Application deactivated"
-						}
-					}
-				}
-			}
+                    if (params.Deactivate_Application) {
+                        echo 'Checkbox is checked'
+                        withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+                            def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+                            bat(deployIntegCmd)
+                            echo "Application deactivated"
+                        }
+                    }
+                }
+            }
         }
-		stage('Undeploy an application') {
+
+        stage('Undeploy an application') {
             steps {
                 script {
-					if (params.Undeploy_Application) {
-						bat """
-							curl --location --request DELETE "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}" \
-							--user ${Username}:${Password}  \
-							--header "Accept: application/json"
-						"""
-					}
-				}
-			}
-		}
+                    if (params.Undeploy_Application) {
+                        bat """
+                            curl --location --request DELETE "${params.Instance_URL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_Name}/revisions/${params.Undeploy_Version}" \
+                            --user ${Username}:${Password}  \
+                            --header "Accept: application/json"
+                        """
+                    }
+                }
+            }
+        }
     }
 }
