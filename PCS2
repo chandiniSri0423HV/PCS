@@ -23,7 +23,8 @@ pipeline {
     environment {
         DEV_Creds = credentials('DEV_CredID')
     }
-	parameters {
+    
+    parameters {
         booleanParam(name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application')
     }
 
@@ -53,27 +54,12 @@ pipeline {
                     echo 'Checkbox is checked'
                     Update_details((params.InstanceURL).toString())
                     withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-                        // Groovy Script for Active Choices Parameter
-def showApplicationID = false
-def showDeactivationVersion = false
-
-if (Deactivate_Application == 'true') {
-    showApplicationID = true
-    showDeactivationVersion = true
-}
-
-return [
-    [$class: 'BooleanParameterDefinition', name: 'Deactivate_Application', defaultValue: false, description: 'Check the box to deactivate the application'],
-    [$class: 'TextParameterDefinition', name: 'Application_ID', defaultValue: '', description: 'Enter the application ID', visible: showApplicationID],
-    [$class: 'TextParameterDefinition', name: 'Deactivate_Application_Version', defaultValue: '', description: 'Enter the deactivation version', visible: showDeactivationVersion]
-]
-
-                        def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${applicationID}/revisions/${deactivationVersion}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
+                        def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
                         bat(deployIntegCmd)
                         echo "Application deactivated"
                     }
                 }
             }
-}
+        }
     }
 }
