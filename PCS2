@@ -44,29 +44,25 @@ pipeline {
         stage('Deactivate Previous Application') {
             steps {
                 script {
-					if (params.Deactivate_Application) {
-                        // Perform action when the checkbox is checked
-						echo 'Checkbox is checked'
-						withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+				def selectedOption = "${params.Undeploy_Or_Deactivate_Application}".trim()
+				withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+						if (selectedOption == 'Deactivate_Application') {
+							// Performs deactivation action when the deactivate is selected
+							echo 'Application deactivated and set to "OFF" state'
 							def deployIntegCmd = "curl -X PATCH \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_OR_Undeploy_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\" --header \"Content-Type: application/json\" --data \"{\\\"state\\\": \\\"OFF\\\", \\\"mode\\\": \\\"RETIRED\\\"}\""
 							bat(deployIntegCmd)
 							echo "Application deactivated"
+						} else if (selectedOption == 'Undeploy_Application') {
+							echo "Application undeployed"
+							def undeployApp = "curl --location --request DELETE \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_OR_Undeploy_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\""
+							bat(undeployApp)
+						} else{
+							echo "Application deployed"
 						}
 					}
 				}
 			}
         }
-		stage('Undeploy an application') {
-			steps {
-				script {
-					if (params.Undeploy_Application) {
-						withCredentials([usernamePassword(credentialsId: 'DEV_CredID', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-							def undeployApp = "curl --location --request DELETE \"${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS/projects/${params.Application_ID}/revisions/${params.Deactivate_OR_Undeploy_Application_Version}\" --user \"${USR}:${passwordHandler(PSW)}\""
-							bat(undeployApp)
-						}
-					}
-				}
-			}
-		}
+		
     }
 }
