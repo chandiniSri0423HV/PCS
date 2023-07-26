@@ -41,7 +41,7 @@ pipeline {
             }
         }
 
-        stage('Deactivate Previous Application') {
+        stage('Deactivate or Undeploy Previous Application') {
             steps {
                 script {
 				def selectedOption = "${params.Undeploy_Or_Deactivate_Application}".trim()
