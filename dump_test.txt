@@ -1,0 +1,54 @@
+Basic auth:
+curl --location 'https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/soa-infra/services/oracleinternalpcs/Applicationication!1.0*soa_155e3ea3-778a-4698-a379-75fd752e2554/ProcessForm.service?WSDL=null' \
+--header 'Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw=='
+
+https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/soa-infra/services/oracleinternalpcs/Applicationication!1.0*soa_155e3ea3-778a-4698-a379-75fd752e2554/ProcessForm.service?WSDL
+
+
+curl -X POST --header 'Content-Type: multipart/form-data' --header 'Accept: application/json' --header 'Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==' -F 'restDeployConfig={"revisionId": "1.0", "overwrite": true, "forceDefault": true, "addMeToAllRoles": false}' -F 'exp=@SampleApplication.exp' 'http://https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/targets/ProcessForm'
+
+
+
+curl -X POST \
+  --header 'Content-Type: multipart/form-data' \
+  --header 'Accept: application/json' \
+  --header 'Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==' \
+  -F 'restDeployConfig={"revisionId": "1.0", "overwrite": true, "forceDefault": true, "addMeToAllRoles": false}' \
+  -F 'exp=@C:/Docs/Git/SampleApplication.exp' \
+  'https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/targets/ProcessForm'
+  
+Worked:
+curl --location 'https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/targets/ORACLEINTERNALPCS' \
+--header 'Accept: application/json' \
+--header 'Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==' \
+--header 'Cookie: JSESSIONID=A5CCeCo2fhzN_PJrYjpWHMk5mfWPIFKDdpq8ac99CH6sroKTh2vW!-1024986835; _WL_AUTHCOOKIE_JSESSIONID=8J13pgJg44zBvP0Mvf07' \
+--form 'restDeployConfig="{\"revisionId\": \"1.0\", \"overwrite\": true, \"forceDefault\": true, \"addMeToAllRoles\": false}"' \
+--form 'exp=@"/C:/Docs/Git/SampleApplication.exp"'
+  
+  https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/targets/ORACLEINTERNALPCS
+  
+curl -X POST --header 'Content-Type: multipart/form-data' --header 'Accept: application/json' -H 'Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==' -F 'projectName=SampleApplication' -F 'description=This is my new project' -F 'quickStartAppId=SampleApplication' 'https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/spaces/155e3ea3-778a-4698-a379-75fd752e2554/projects'
+
+
+curl -X POST --header 'Content-Type: application/x-www-form-urlencoded' --header 'Accept: application/json' -H 'Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==' -d 'spaceName=SampleSpace' 'https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/spaces'
+Space ID:
+https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/spaces
+curl -X POST --header 'Content-Type: application/x-www-form-urlencoded' --header 'Accept: application/json' -H 'Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==' -d 'spaceName=Space1' 'http://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/spaces'
+
+
+step1-cuse the worked command
+https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/soa-infra/services/oracleinternalpcs/SampleApplication!1.0*soa_c648317d-5859-4f6a-bdb4-e7894dcbe941/Form.service?WSDL
+https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/processes 
+
+curl -X POST --header 'Content-Type: multipart/form-data' --header 'Accept: application/json' -H 'Authorization: Bearer access_token' -F 'projectName=MyProject321' -F 'description=This is my new project' -F 'quickStartAppId=Travel Approval' 'http://example.com.com:7001/ic/api/process/v1/spaces/<spaceId>/projects'
+
+
+step2-
+
+
+curl -X POST \
+--header "Authorization: Basic RGV2b3BzX3VzZXI6T2ljX0plbmtpbnMjMjAyMw==\
+--header 'content-type: application/json' \
+--header 'x-http-method-override: PATCH' \
+-d '{     "state": "ON",     "mode": "ACTIVE"   }'
+https://testinstance-idevjxz332qf-ia.integration.ocp.oraclecloud.com/ic/api/process/v1/targets/oracleinternalpcs/projects/DOCs/revisions/5 
