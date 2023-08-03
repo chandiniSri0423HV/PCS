@@ -15,6 +15,11 @@ def Update_details(instance_selected) {
         env.PSW = env.DEV_Creds_PSW
         env.serviceURL = env.DEV_URL
     }
+else if (instance_selected.equals("UAT")) {
+        env.USR = env.DEV_Creds_USR
+        env.PSW = env.DEV_Creds_PSW
+        env.serviceURL = env.TEST_URL
+    }
 }
 
 pipeline {
