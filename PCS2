@@ -33,7 +33,7 @@ pipeline {
         stage('Import Process Application') {
             steps {
                 script {
-                    Update_details((params.InstanceURL).toString())
+                    Update_details((params.Instance_URL).toString())
                     //echo "${env.serviceURL}"
                     bat """
                         curl --location "${env.serviceURL}/ic/api/process/v1/targets/ORACLEINTERNALPCS" \
